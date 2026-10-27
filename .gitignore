@@ -1,0 +1,46 @@
+# --- Compilados y ejecutables ---
+*.exe
+build/
+dist/
+*.spec.bak
+
+# --- Navegadores de Playwright (pesan cientos de MB) ---
+playwright_browsers/
+ms-playwright/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# --- Credenciales y configuración local ---
+# Ajustá estos nombres al archivo donde guardás los proveedores
+.env
+*.env
+credenciales*.json
+proveedores*.json
+config_local*.json
+*.db
+*.sqlite
+
+# --- Descargas y logs ---
+descargas/
+downloads/
+listas/
+logs/
+*.log
+*.xlsx
+*.xls
+*.csv
+
+# --- Sistema / editores ---
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
+config.json
+proveedores/

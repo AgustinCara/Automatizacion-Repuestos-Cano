@@ -1,0 +1,4 @@
+customtkinter>=5.2.2
+playwright>=1.44.0
+python-dotenv>=1.0.0
+nest_asyncio>=1.6.0
