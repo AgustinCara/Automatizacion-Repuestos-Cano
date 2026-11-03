@@ -43,3 +43,4 @@ desktop.ini
 .vscode/
 .idea/
 config.json
+cargar_proveedores_config.py

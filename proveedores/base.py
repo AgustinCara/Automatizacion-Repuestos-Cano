@@ -71,6 +71,31 @@ class BaseProveedor(ABC):
     # Método principal — implementar en cada subclase
     # ------------------------------------------------------------------
 
+    def lanzar_navegador(self, p, headless: bool = True):
+        """
+        Lanza Chromium de forma robusta. Si el Chromium de Playwright no está
+        disponible en la PC (p. ej. falta 'chromium_headless_shell'), prueba con
+        Microsoft Edge (viene en todo Windows 10/11) y luego con Google Chrome.
+        """
+        intentos = [
+            ("Chromium de Playwright", {}),
+            ("Microsoft Edge", {"channel": "msedge"}),
+            ("Google Chrome", {"channel": "chrome"}),
+        ]
+        errores = []
+        for nombre, extra in intentos:
+            try:
+                browser = p.chromium.launch(headless=headless, **extra)
+                if errores:
+                    self.log(f"Navegador alternativo en uso: {nombre}")
+                return browser
+            except Exception as e:  # noqa: BLE001
+                primera = str(e).strip().splitlines()[0] if str(e).strip() else repr(e)
+                errores.append(f"{nombre}: {primera}")
+        raise ProveedorError(
+            "No se pudo abrir ningún navegador.\n" + "\n".join(errores)
+        )
+
     @abstractmethod
     def descargar(self, directorio_destino: str | Path, headless: bool = True) -> str:
         """

@@ -27,6 +27,31 @@ _BASE_DIR = Path(__file__).resolve().parent
 if str(_BASE_DIR) not in sys.path:
     sys.path.insert(0, str(_BASE_DIR))
 
+# ── Ubicar los navegadores de Playwright empaquetados ─────────────────────────
+# PyInstaller (--onedir) puede dejar la carpeta junto al .exe o dentro de
+# _internal/. Si PLAYWRIGHT_BROWSERS_PATH no apunta a una carpeta existente,
+# se busca en esas ubicaciones.
+def _configurar_navegadores_playwright() -> None:
+    actual = os.environ.get("PLAYWRIGHT_BROWSERS_PATH")
+    if actual and Path(actual).is_dir() and any(Path(actual).iterdir()):
+        return
+    candidatos = []
+    if getattr(sys, "frozen", False):
+        exe_dir = Path(sys.executable).resolve().parent
+        candidatos += [exe_dir / "playwright_browsers", exe_dir / "_internal" / "playwright_browsers"]
+        meipass = getattr(sys, "_MEIPASS", None)
+        if meipass:
+            candidatos.append(Path(meipass) / "playwright_browsers")
+    candidatos.append(_BASE_DIR / "playwright_browsers")
+    for c in candidatos:
+        if c.is_dir() and any(c.iterdir()):
+            os.environ["PLAYWRIGHT_BROWSERS_PATH"] = str(c)
+            return
+    if actual:  # la ruta configurada no sirve: dejar que Playwright use la predeterminada
+        os.environ.pop("PLAYWRIGHT_BROWSERS_PATH", None)
+
+_configurar_navegadores_playwright()
+
 from proveedores import PROVEEDORES, PROVEEDORES_DIR, cargar_proveedores
 from dialog_proveedor import VentanaAgregarProveedor
 from tkinter import messagebox

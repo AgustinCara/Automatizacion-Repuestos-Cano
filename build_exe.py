@@ -108,6 +108,10 @@ def build():
         "proveedores.proveedor_distem",
         "proveedores.proveedor_expoyer",
         "proveedores.base",
+        "proveedores._web",
+        "proveedores._slaweb",
+        "openpyxl",
+        "xlrd",
         "dialog_proveedor",
     ]
     for imp in hidden_imports:
