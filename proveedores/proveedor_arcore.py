@@ -7,7 +7,6 @@ Recorrido: login -> en la página se ve el TXT -> descargar
 from proveedores.base import BaseProveedor
 from proveedores._web import FlujoWebMixin
 
-
 class ProveedorArcore(FlujoWebMixin, BaseProveedor):
     nombre_clave = "arcore"
     nombre_display = "Arcore"

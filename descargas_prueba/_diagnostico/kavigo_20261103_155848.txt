@@ -1,0 +1,2 @@
+URL: https://www.kavigo.com/
+Error: No se encontró el campo de contraseña en la página de ingreso

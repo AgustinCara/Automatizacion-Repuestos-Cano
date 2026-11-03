@@ -13,8 +13,9 @@ class ProveedorKavigo(FlujoWebMixin, BaseProveedor):
     nombre_display = "Kavigo"
 
     def pasos(self, page, cfg):
-        page = self.login(page, cfg, ["https://www.kavigo.com", "https://www.kavigo.com.ar"])
+        page = self.login(page, cfg, ["https://www.kavigo.com/login.php?le=3"])
         page = self.clic_texto(page, ["Lista de precios", "Listas de precios", "Lista precios", "Precios"])
+
         tmp = self.bajar_archivo(
             page, ["dbf", "zip"], pistas=["lispre"],
             textos=["lispre", "Descargar archivo", "DBF"],

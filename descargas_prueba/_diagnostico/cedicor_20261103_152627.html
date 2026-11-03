@@ -1,0 +1,358 @@
+<!DOCTYPE html><html><head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cedicor</title>
+    <meta name="description" content="Sitios web y aplicativo online de la empresa Cedicor de la ciudad de Córdoba">
+    <meta name="author" content="CEDICOR">
+    <link rel="icon" type="image/png" href="/img/favicon.png">
+    <link rel="stylesheet" type="text/css" href="/css/base/cake.css"><link rel="stylesheet" type="text/css" href="/css/site/styles.css"><link rel="stylesheet" type="text/css" href="/css/bootstrap3/bootstrap.min.css">    <!-- cambiar esto -->
+    <style type="text/css">
+        ul,
+        ol {
+            list-style: none;
+            background-color: none;
+        }
+
+        .nav li a {
+            color: #fff;
+            display: block;
+            text-decoration: none;
+        }
+
+        .nav li ul {
+            display: none;
+            position: absolute;
+            min-width: 140px;
+        }
+
+        .nav li:hover>ul {
+            display: block;
+            background-color: none;
+        }
+
+
+        .nav li ul li ul {
+            position: relative;
+            background-color: #333;
+        }
+
+        .nav li ul li ul {
+            rigth: -140px;
+            top: 0px;
+        }
+    </style>
+
+
+    <!-- librerías opcionales que activan el soporte de HTML5 para IE8 -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+      <![endif]-->
+</head>
+<!--Start of Tawk.to Script-->
+<!-- <script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/613613ded6e7610a49b3e3f6/1fetjr7tu';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script> -->
+<!--End of Tawk.to Script-->
+<body>
+    <div id="wrap">
+        <!-- CABECERA -->
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-4 company-logos">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-md-4" id="navbar-cedicor">
+                                    <div class="navbar-header">
+                                                                                
+                                        <a class="navbar-brand" href="/inicio">
+                                            <img src="/img/logo_v2.png" alt="Cedicor" class="img-responsive">                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" id="navbar-mwm">
+                                    <img src="/img/mwm_logo.jpg" alt="Logo MWM" class="img-responsive">                                </div>
+                                <div class="col-md-5" id="navbar-mwm-text">
+                                    <i class="navbar-text text-smaller">
+                                        DISTRIBUIDOR OFICIAL MWM INTERNATIONAL MOTORES S.A.
+                                    </i>
+                                </div>
+                                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-1">
+                                            <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span>
+                                            <span class="icon-bar"></span><span class="icon-bar"></span>
+                                        </button>                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="container-fluid">                            
+                            <div class="row">
+                                                            <ul class="nav navbar-nav navbar-right">
+                                                                        <li>
+                                        <a href="/pedido">
+                                            <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span>
+                                            (<span class="pedido-cantidad">0</span>)
+                                        </a>
+                                    </li>
+                                </ul>
+                                                                <div class="collapse navbar-collapse" id="navbar-collapse-1">
+                                    <ul class="nav navbar-nav navbar-right">
+                                        <li class=""><a href="/empresa">Empresa</a></li>                                        <li class=""><a href="/productos">Productos</a></li>                                        <li class=""><a href="/novedades">Novedades</a></li>                                        <li class=""><a href="/contacto">Contacto</a></li>                                                                                                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                                CANO HORACIO ALBERTO                                                <span class="caret"></span>
+                                                                                            </a>
+                                            <ul class="dropdown-menu" role="menu">
+                                                <li>
+                                                    <a href="/datos">
+                                                        <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                                                        Ficha cliente
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="/guias">
+                                                        <span class="glyphicon glyphicon-road" aria-hidden="true"></span>
+                                                        Guías de Transporte
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-btn">
+                                                        <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+                                                            Gestión de Pedidos <i class="caret"></i>
+                                                        <i class="fa fa-caret-down"></i>
+                                                    </a>
+                                                    <div class="dropdown-container">
+                                                        <a class="dropdown-internal-user-menu" href="/pedido">
+                                                             Pedido actual
+                                                        </a>
+                                                        <a class="dropdown-internal-user-menu" href="/enviados">
+                                                            Pedidos enviados
+                                                        </a>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <a href="" data-toggle="modal" data-target="#bank-data-modal">
+                                                        <span class="glyphicon glyphicon-usd"></span>
+                                                        Cuentas bancarias
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-btn">
+                                                        <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+                                                        Descargas <i class="caret"></i>
+                                                        <i class="fa fa-caret-down"></i>
+                                                    </a>
+                                                    <div class="dropdown-container">
+                                                        <a class="dropdown-internal-user-menu" href="/download_precios">
+                                                            Precios
+                                                        </a>
+                                                        <a class="dropdown-internal-user-menu" href="/pages/download_ofertas">
+                                                            Ofertas
+                                                        </a>
+                                                        <a class="dropdown-internal-user-menu" href="/pages/descargas_cliente/catalogos">
+                                                            Catálogos
+                                                        </a>
+                                                        <a class="dropdown-internal-user-menu" href="/pages/descargas_cliente/otros">
+                                                            Otros
+                                                        </a>
+                                                        <a class="dropdown-internal-user-menu" href="/historial_descargas">
+                                                            Historial
+                                                        </a>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <a href="/contrasena/1222">
+                                                        <span class="glyphicon glyphicon-asterisk" aria-hidden="true"></span>
+                                                        Cambiar contraseña
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="/pages/logout">
+                                                        <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
+                                                        Salir
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                    <!-- Finaliza los datos del cliente -->
+                                                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <!-- CONTENIDO -->
+        <div class="content">
+            <div id="precios" class="container">
+    <div id="navegacion" class="well row d-flex align-items-center">
+        <div class="col-md-8">
+            <h2>Descargar listas de precios</h2>
+        </div>
+        <div class="col-md-4 d-flex justify-content-end align-items-center">
+            <button data-brand-id="all" class="btn btn-primary downloadBrand">Descargar</button>
+            <a href="/productos" class="btn btn-default my-1" id="btn-back">Volver a Productos</a>
+            <div class="loader square-25 my-1 hidden" id="loader"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="well text-center">
+            Seleccione las marcas que desea incluir en la lista de precios y haga click en "Descargar"
+        </div>
+    </div>
+    <div class="row">
+        <div class="text-center">
+            <button type="button" class="btn btn-default" id="precios_download_all">Seleccionar todos</button>
+            <button type="button" class="btn btn-default" id="precios_download_all_grouped">Seleccionar todos (con pestaña Todos)</button>
+        </div>
+    </div>
+    <br>
+
+        <div class="row">
+                    <div class="col-md-3">
+                <div class="panel panel-primary" data-brand-id="1">
+                    <div class="panel-heading d-flex justify-content-between">
+                            MWM INT. MOTORES                            <input class="precios_download_by_brand" data-brand-id="1" type="checkbox" style="">
+                    </div>
+                    <div class="panel-body">Última descarga: 3-11-2026</div>
+                </div>
+            </div>
+                    <div class="col-md-3">
+                <div class="panel panel-primary" data-brand-id="2">
+                    <div class="panel-heading d-flex justify-content-between">
+                            IMPORTADO                            <input class="precios_download_by_brand" data-brand-id="2" type="checkbox" style="">
+                    </div>
+                    <div class="panel-body">Última descarga: 3-11-2026</div>
+                </div>
+            </div>
+                    <div class="col-md-3">
+                <div class="panel panel-primary" data-brand-id="3">
+                    <div class="panel-heading d-flex justify-content-between">
+                            ORIGINAL                            <input class="precios_download_by_brand" data-brand-id="3" type="checkbox" style="">
+                    </div>
+                    <div class="panel-body">Última descarga: 3-11-2026</div>
+                </div>
+            </div>
+                    <div class="col-md-3">
+                <div class="panel panel-primary" data-brand-id="5">
+                    <div class="panel-heading d-flex justify-content-between">
+                            BLK DIESEL                            <input class="precios_download_by_brand" data-brand-id="5" type="checkbox" style="">
+                    </div>
+                    <div class="panel-body">Última descarga: 3-11-2026</div>
+                </div>
+            </div>
+            </div>
+        <div class="row">
+                    <div class="col-md-3">
+                <div class="panel panel-primary" data-brand-id="6">
+                    <div class="panel-heading d-flex justify-content-between">
+                            GESPANNT                            <input class="precios_download_by_brand" data-brand-id="6" type="checkbox" style="">
+                    </div>
+                    <div class="panel-body">Última descarga: 3-11-2026</div>
+                </div>
+            </div>
+                    <div class="col-md-3">
+                <div class="panel panel-primary" data-brand-id="7">
+                    <div class="panel-heading d-flex justify-content-between">
+                            NACIONAL                            <input class="precios_download_by_brand" data-brand-id="7" type="checkbox" style="">
+                    </div>
+                    <div class="panel-body">Última descarga: 3-11-2026</div>
+                </div>
+            </div>
+                    <div class="col-md-3">
+                <div class="panel panel-primary" data-brand-id="9">
+                    <div class="panel-heading d-flex justify-content-between">
+                            PERKINS                            <input class="precios_download_by_brand" data-brand-id="9" type="checkbox" style="">
+                    </div>
+                    <div class="panel-body">Última descarga: 3-11-2026</div>
+                </div>
+            </div>
+                    <div class="col-md-3">
+                <div class="panel panel-primary" data-brand-id="10">
+                    <div class="panel-heading d-flex justify-content-between">
+                            ABR                            <input class="precios_download_by_brand" data-brand-id="10" type="checkbox" style="">
+                    </div>
+                    <div class="panel-body">Última descarga: 3-11-2026</div>
+                </div>
+            </div>
+            </div>
+        <div class="row">
+                    <div class="col-md-3">
+                <div class="panel panel-primary" data-brand-id="11">
+                    <div class="panel-heading d-flex justify-content-between">
+                            CUMMINS                            <input class="precios_download_by_brand" data-brand-id="11" type="checkbox" style="">
+                    </div>
+                    <div class="panel-body">Última descarga: 3-11-2026</div>
+                </div>
+            </div>
+            </div>
+        </div>
+        </div>
+        <!-- PIE -->
+        <div class="container-fluid footer">
+            <div class="row clearfix box">
+                <div class="col-md-12 column">
+                    <div class="row clearfix">
+                        <div class="hidden-xs col-sm-2 col-lg-2 column">
+                            <img src="/img/cedicor.png" alt="Cedicor" class="img-responsive" width="175" height="85">                        </div>
+                        <div class="col-xs-12 col-sm-3 col-lg-3 column">
+                            <address> <strong>Cedicor S.R.L.</strong><br>Mza.50 - Lote 26 - Parque Industrial POLO 52 Autopista Cba. Rosario KM 700<br> Córdoba - Capital<br><abbr title="Phone">Tel:</abbr> (0351) 4733073 L.Rot./ (0351) 3063901/03</address>                        </div>
+                        <div class="hidden-xs col-sm-2 col-lg-2 col-lg-offset-2 column">
+                            <ul>
+                                <li class=""><a href="/inicio">Inicio</a></li>                                <li class=""><a href="/empresa">Empresa</a></li>                                <li class=""><a href="/productos">Productos</a></li>                                <li class=""><a href="/novedades">Novedades</a></li>                                <li class=""><a href="/contacto">Contacto</a></li>                            </ul>
+                        </div>
+                        <div class="hidden-xs col-sm-3 col-lg-3 column">
+                            <ul>
+                                <li class=""><a href="/recuperar">Recuperar contraseña</a></li>                                <li class=""><a href="/registrarse">Registrarse</a></li>                                <li class=""><a href="/login">Ingresar</a></li>                                <li><a href="http://www.leoporoli.com.ar" class="leoporoli" target="_blank">Desarrollado
+                                        por: Leo Poroli - Diseñador Multimedia</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+                <div class="modal modal-small fade" id="bank-data-modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                        <h4 class="modal-title text-center">Cuentas Bancarias</h4>
+                    </div>
+                    <div class="modal-body">
+                        <h4 class="text-center">CEDICOR S.R.L.</h4>
+                        <br>
+                        <p><b>BANCO:</b> BANCO MACRO S.A.</p>
+                        <p><b>CTA CTE:</b> 3-309-0000003137-9</p>
+                        <p><b>SUCURSAL:</b> 309</p>
+                        <p><b>CBU:</b> 2850309-53000000031379-8</p>
+                        <p><b>CUIT:</b> 30-70783733-7</p>
+
+                        <hr>
+
+                        <h4 class="text-center">CENTRO DISTRIBUIDOR CORDOBA - Lopez Susana</h4>
+                        <br>
+                        <p><b>BANCO:</b> BANCO MACRO S.A.</p>
+                        <p><b>CTA CTE:</b> 3-309-0000003054-3</p>
+                        <p><b>SUCURSAL:</b> 309</p>
+                        <p><b>CBU:</b> 2850309-53000000030543-4</p>
+                        <p><b>CUIT:</b> 27-14291221-5</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+                <script type="text/javascript" src="/js/base/jquery-1.9.1.js"></script><script type="text/javascript" src="/js/site/scripts.js"></script><script type="text/javascript" src="/js/bootstrap3/bootstrap.min.js"></script>    </div>
+
+
+
+</body></html>

@@ -20,19 +20,24 @@ class ProveedorCedicor(FlujoWebMixin, BaseProveedor):
         # "Precios" está en el menú que se abre con la flecha del nombre:
         # clic_texto abre los menús desplegables solo si no lo ve.
         page = self.clic_texto(page, ["Precios", "Lista de precios"])
+        if cfg.get("download_page"):
+            # URL directa de la búsqueda (más confiable que usar el buscador)
+            self.ir_a(page, cfg["download_page"])
         self.tildar_todos(page)
         tmp = self.bajar_archivo(
             page, ["xlsx", "xls", "csv", "zip"], pistas=["excel", "xls"],
             textos=["Descargar Excel", "Exportar a Excel", "Excel", "Descargar"],
         )
-        excel = Path(self.guardar_final(tmp, "_cedicor_excel.xlsx", acepta_html=True))
-        salida = self._destino / cfg.get("nombre_archivo", "CEDICOR.CSV")
-        filas = excel_a_csv(
-            excel, salida,
-            separador=cfg.get("separador_csv", ";"),
-            decimal=cfg.get("decimal_csv", ","),
-            encoding=cfg.get("encoding_csv", "cp1252"),
-        )
-        excel.unlink(missing_ok=True)
-        self.log(f"Excel convertido a CSV ({filas} filas)")
-        return str(salida)
+        return self.guardar_final(tmp, cfg.get("nombre_archivo", "CEDICOR.CSV"))
+    
+        # excel = Path(self.guardar_final(tmp, "CEDICOR.CSV", acepta_html=True))
+        # salida = self._destino / cfg.get("nombre_archivo", "CEDICOR.CSV")
+        # filas = excel_a_csv(
+        #     excel, salida,
+        #     separador=cfg.get("separador_csv", ";"),
+        #     decimal=cfg.get("decimal_csv", ","),
+        #     encoding=cfg.get("encoding_csv", "cp1252"),
+        # )
+        # excel.unlink(missing_ok=True)
+        # self.log(f"Excel convertido a CSV ({filas} filas)")
+        # return str(salida)

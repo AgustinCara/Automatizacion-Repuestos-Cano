@@ -329,7 +329,7 @@ class FlujoWebMixin:
                                     && getComputedStyle(e).visibility !== 'hidden';
                     const all = Array.from(document.querySelectorAll('input'));
                     for (let i = all.indexOf(pwd) - 1; i >= 0; i--) {
-                        const e = all[i], t = (e.getAttribute('type') || 'text').toLowerCase();
+                        const e = all[i], t = (e.type || 'text').toLowerCase();
                         if (['text','email','tel','number'].includes(t) && vis(e) && !e.disabled && !e.readOnly) {
                             e.setAttribute('data-cano-usuario', '1'); return true;
                         }

@@ -14,11 +14,13 @@ class ProveedorAltamira(FlujoWebMixin, BaseProveedor):
 
     def pasos(self, page, cfg):
         # En la planilla figura "www.alatmiragroup.com.ar": se prueban las dos variantes
-        page = self.login(page, cfg, ["https://www.altamiragroup.com.ar",
-                                      "https://www.alatmiragroup.com.ar"])
+        page = self.login(page, cfg, ["https://www.altamiragroup.com.ar"])
+        if cfg.get("download_page"):
+            # URL directa de la búsqueda (más confiable que usar el buscador)
+            self.ir_a(page, cfg["download_page"])
         tmp = self.bajar_archivo(
-            page, ["xlsx", "xls", "zip"], pistas=["xls", "lista", "precio"],
-            textos=["Lista de precios", "Descargar lista", "XLS", "Excel"],
-            menus_previos=["Descargas", "Lista de precios", "Precios"],
+            page, ["xlsx", "xls", "zip"], pistas=["xls", "excel"],
+            textos=["Descargar XLS", "Descargar Excel", "XLS", "Excel", "Descargar"],
+            excluir=["Lista de precios"],
         )
         return self.guardar_final(tmp, cfg.get("nombre_archivo", "altamira.xlsx"))

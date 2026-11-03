@@ -1,0 +1,2 @@
+URL: https://www.cedicor.com.ar/download_precios
+Error: ModuleNotFoundError: No module named 'xlrd'

@@ -1,0 +1,562 @@
+<!DOCTYPE html><html class="js flexbox canvas canvastext webgl no-touch geolocation postmessage no-websqldatabase indexeddb hashchange history draganddrop websockets rgba hsla multiplebgs backgroundsize borderimage borderradius boxshadow textshadow opacity cssanimations csscolumns cssgradients cssreflections csstransforms csstransforms3d csstransitions fontface generatedcontent video audio localstorage sessionstorage webworkers no-applicationcache svg inlinesvg smil svgclippaths"><!--<![endif]--><head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>Kavigo</title>
+	<script>
+    var prod = Boolean (1);
+</script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16">
+<!-- GFONTS_____________________________________ -->
+<link href="https://fonts.googleapis.com/css?family=Raleway:400,100,300,500,600,700,900" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,600,700,800" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+	<link href="css/allb64.css?c=80" rel="stylesheet" media="all" type="text/css">
+<link rel="stylesheet" href="css/aux2.css?c=80">
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script>
+	window.jQuery || document.write('<script src="js/jquery-1.12.4.min.js"><\/script>')
+</script>
+
+	<script src="js/all.js?c=80" type="text/javascript"></script><style type="text/css">.imgLiquid img {visibility:hidden}</style>
+<script>
+	// var refreshTime = 600000; // every 10 minutes in milliseconds
+	var refreshTime = 300000; // every 10 minutes in milliseconds
+	window.setInterval(function() {
+		$.ajax({
+			cache: false,
+			type: "GET",
+			url: "refreshSession.php",
+			success: function(data) {}
+		});
+	}, refreshTime);
+	window.setInterval(function() {
+		$.ajax({
+				url: "update_carrito.php",
+				type: 'POST',
+			})
+			.done(function(response) {
+				console.log(response);
+				if (response == 1) {
+					$.ajax({
+							url: '_inc_carrito_update.php',
+							type: 'POST',
+						})
+						.done(function(response) {
+							$('.carrito-shop').html(response);
+							$('.listProductsAfterAjax').css("max-height", "380px");
+							$('.listProductsAfterAjax').css("overflow-y", "auto");
+						});
+				}
+			});
+	}, 5000);
+</script>
+	<style>
+		@media screen and (max-width: 1092px) {
+
+			.col-md-5.lado_1,
+			.col-md-4.lado_1 {
+				background-image: "url "(/gfxtmp/img_chicas_inst.png)";"
+			}
+		}
+
+		.ima_porcentaje {
+			width: 100%;
+		}
+
+		.position_abajo {
+
+			position: relative;
+			left: 5em;
+		}
+	</style>
+	<link rel="stylesheet" type="text/css" href="./css/whatsappme.min.css">
+<style type="text/css">.fancybox-margin{margin-right:15px;}</style></head>
+
+<body class="homepage JSscrollScreen">
+
+	<!-- MENU BURGER -->
+<div class="menuBurger">
+	<img class="closeBtn" onclick="apagamenuMobileBehavior()" src="gfx/closeAlt.png?c=1" alt="">
+	<div class="menuBurgerScroll">
+		<div class="menuGen">
+			<div class="menuGenWrapp">
+				<!-- <div class="ulBurgerDiv">
+					<span class="bold sepuerbold"><a href="#" title="">Productos</a></span>
+					<ul class="ulBurger">
+						<li><a href="listado.php">Sistemas de CCTV</a></li>
+						<li><a href="listado.php">Sistemas de Intrusión</a></li>
+						<li><a href="listado.php">Control de Accesos</a></li>
+						<li><a href="listado.php">Drones</a></li>
+						<li><a href="listado.php">Sistemas de detección de Incendio</a></li>
+						<li><a href="listado.php">Broadcasting</a></li>
+						<li><a href="listado.php">Sistemas de Audio</a></li>
+						<li><a href="listado.php">Iluminación</a></li>
+						<li><a href="listado.php">Componentes de Electrónica e Industria</a></li>
+					</ul>
+				</div> -->
+				<div class="ulBurgerDiv"><span class="bold"><a href="institucional.php">Institucional</a></span></div>
+				<div class="ulBurgerDiv"><span class="bold"><a href="productos.php">Productos</a></span></div>
+				<div class="ulBurgerDiv"><span class="bold"><a href="marcas.php">Marcas</a></span></div>
+				<div class="ulBurgerDiv"><span class="bold"><a href="servicios.php">Servicios</a></span></div>
+				<div class="ulBurgerDiv"><span class="bold"><a href="lista_precio.php">Lista de precios</a></span></div>
+				<div class="ulBurgerDiv"><span class="bold"><a href="compra_rapida.php">Compra rápida</a></span></div>
+				<div class="ulBurgerDiv"><span class="bold"><a href="contacto.php">Contacto</a></span></div>
+			</div>
+		</div>
+	</div>
+</div>
+<header>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$(".fancybox").fancybox();
+			$('.fancyboxModalGenerico').fancybox({
+				width: 750,
+				height: '100%',
+				maxHeight: '80%',
+				maxWidth: '90%',
+				autoSize: true,
+				closeClick: false,
+				closeBtn: true,
+				openEffect: 'none',
+				wrapCSS: '',
+				closeEffect: 'none',
+				padding: 0,
+				margin: 10,
+				helpers: {
+					overlay: {
+						locked: true
+					}
+				}
+			});
+		});
+
+		function formatValues(data) {
+			return data.codigo + ':' + data.descripcion;
+		}
+	</script>
+	<div class="container ">
+		<div class="row">
+			<div class="col-md-12 containerRel">
+				<img src="gfx/icon_menu_w.png" onclick="prendemenuMobileBehavior()" class="xburg" alt="">
+				<a href="index.php"><img src="gfx/brand.png" class="brand" alt=""></a>
+				<!-- ************ -->
+				<nav class="topNav onlyDesktop2">
+					<ul class="horizontal">
+						<!--<li class="prods"><a href="productos.php">Productos</a></li>-->
+						<li><a href="productos.php">Productos</a></li>
+						<li><a href="quienes_somos.php">Institucional</a></li>
+						<!-- <span class="dropdown">
+							<li>
+								<a href="#" class="overTop">Productos</a>
+							</li>
+						</span> -->
+						<li><a href="marcas.php">Marcas</a></li>
+						<li><a href="lista_precio.php">Lista de precios</a></li>
+						<li><a href="compra_rapida.php">Compra rápida</a></li>
+						<li><a href="contacto.php">Contacto</a></li>
+					</ul>
+				</nav>
+				<div class="iconsTop">
+					<!-- <a href="#" class="onlyDesktop mainIcon noHouse" onclick="togleSearch();"><img src="gfx/icon_search_w.png" alt=""></a>
+					<input type="text" class="txtSearchTop closed noHouse" /> -->
+											<span class="btn-group JSdropdownTopGroup">
+							<a href="#" class="dropdown-toggle mainIcon JStopAccount" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								<img src="gfx/icon_user_w.png" alt="">
+							</a>
+							<div class="dropdown-menu dropdownTop">
+								<div class="cuentaContent">
+									<div class="cuentaHeader">
+										<div class="title">Login</div>
+									</div>
+								</div>
+								<div>
+									<p>Por favor, iniciá sesión con tu e-mail y contraseña</p>
+									<form role="form" method="post" action="login_envia.php" onsubmit="return validar2();">
+	
+	<div class="form-group">
+		<label for="nombre">Usuario*</label>
+		<input type="text" name="nombre" class="form-control" id="nombre" style="">
+	</div>
+	<div class="form-group">
+		<label for="pwd">Contraseña*</label>
+		<input type="password" name="clave" class="form-control" id="pwd" style="">
+	</div>
+	<br>
+	<a href="recuperar_clave.php">¿Olvidaste tu contraseña?<br><br></a>
+	<div class="onlyMobile">
+		<br>
+	</div>
+	<button type="submit" class="buttonGen violeta buttonGenBig pull-right">Ingresar</button>
+	
+</form>									<hr>
+									<a href="login.php" class="buttonGen violeta buttonGenBig pull-right finalizarBot">Registrate ahora</a>
+								</div>
+							</div>
+						</span>
+								</div>
+		</div>
+	</div>
+	</div>
+	<!-- Modal -->
+	<div class="modal fade" id="modalListCarritos" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true" style="font-size: 34px;">×</span>
+					</button>
+					<h5 class="modal-title" id="exampleModalLabel" style="padding-bottom: 10px;color: #f35041;font-weight: bold;">Mis carritos</h5>
+					Ahora podés traer el contenido de un carrito guardado a tu carrito actual. Sólo elije el que quieras y presioná el botón TRAER.
+					
+				</div>
+				<div class="modal-body">
+					<ul style="margin-left: -25px!important;">
+																			<h3>No tenés carritos guardados</h3>
+											</ul>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="buttonGen buttonGenBig finalizarBot violeta pull-right btnCerrarListadoCarrito" style="width: 100px;margin-right: 10px;" data-dismiss="modal">Cancelar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="modalSaveCarrito" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true" style="font-size: 34px;">×</span>
+					</button>
+					<h5 class="modal-title" id="exampleModalLabel" style="padding-bottom: 10px;color: #f35041;font-weight: bold;">Guardar carrito</h5>
+					Ahora podés guardar el contenido del carrito para poder utilizarlo nuevamente en un futuro. Sólo dale un nombre y presioná el botón GUARDAR.
+					
+				</div>
+				<form action="" class="formNameCarrito">
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="">Nombre carrito</label>
+							<input type="hidden" name="accion" value="guardarCarrito" style="">
+							<input type="text" required="" class="form-control" name="nombre" placeholder="Ingrese Nombre" style="">
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="submit" class="buttonGen buttonGenBig finalizarBot violeta pull-right" style="width: 100px;margin-right: 10px;border-color: #f35041;">Guardar</button>
+						<button type="button" class="buttonGen buttonGenBig finalizarBot violeta pull-right closeModalSaveCarrito" style="width: 100px;margin-right: 10px;" data-dismiss="modal">Cancelar</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</header>
+<subheader>
+	<div class="container">
+		<input type="" name="" class="subHeaderTop" style="">
+	</div>
+</subheader>
+<script>
+	$(".formNameCarrito").submit(function(event) {
+		var data = $(this).serialize();
+		event.preventDefault();
+		$.ajax({
+				url: 'carritoUserProcess.php',
+				type: 'POST',
+				data: data,
+			})
+			.done(function(response) {
+				$('.closeModalSaveCarrito').click();
+				var jResponse = $.parseJSON(response);
+				swal({
+					text: jResponse.mensaje,
+					confirmButtonText: "Ok",
+					type: jResponse.type,
+					confirmButtonClass: jResponse.btnClass,
+					allowEscapeKey: false,
+					confirmButtonColor: "#5D9CEC",
+					allowOutsideClick: false
+				})
+				if (jResponse.reloadLogin) {
+					$(".btnError").click(function(event) {
+						window.location.href = jResponse.reloadLogin;
+					});
+				}
+				$(".btnOkSuccess").click(function(event) {
+					location.reload();
+				});
+			})
+			.fail(function() {
+				console.log("error");
+			})
+			.always(function() {
+				console.log("complete");
+			});
+	});
+
+	$(".btnCargarCarrito").click(function(event) {
+		var idCarrito = $(this).data("id");
+		$.ajax({
+				url: 'carritoUserProcess.php',
+				type: 'POST',
+				data: {
+					"accion": "cargarCarritoUser",
+					"carritoId": idCarrito,
+				},
+			}).done(function(response) {
+				$('.btnCerrarListadoCarrito').click();
+				var jResponse = $.parseJSON(response);
+				swal({
+					text: jResponse.mensaje,
+					confirmButtonText: "Ok",
+					type: jResponse.type,
+					confirmButtonClass: jResponse.btnClass,
+					allowEscapeKey: false,
+					confirmButtonColor: "#5D9CEC",
+					allowOutsideClick: false
+				})
+				if (jResponse.reloadLogin) {
+					$(".btnError").click(function(event) {
+						window.location.href = jResponse.reloadLogin;
+					});
+				}
+				$(".btnOkSuccess").click(function(event) {
+					location.reload();
+				});
+			})
+			.fail(function() {
+				console.log("error");
+			})
+			.always(function() {
+				console.log("complete");
+			});
+	});
+
+	$(".btnEliminarCarrito").click(function(event) {
+		var idCarrito = $(this).data("id");
+		$.ajax({
+				url: 'carritoUserProcess.php',
+				type: 'POST',
+				data: {
+					"accion": "eliminarCarritoUser",
+					"carritoId": idCarrito,
+				},
+			})
+			.done(function(response) {
+				$('.btnCerrarListadoCarrito').click();
+				var jResponse = $.parseJSON(response);
+				swal({
+					text: jResponse.mensaje,
+					confirmButtonText: "Ok",
+					type: jResponse.type,
+					confirmButtonClass: jResponse.btnClass,
+					allowEscapeKey: false,
+					confirmButtonColor: "#5D9CEC",
+					allowOutsideClick: false
+				})
+				if (jResponse.reloadLogin) {
+					$(".btnError").click(function(event) {
+						window.location.href = jResponse.reloadLogin;
+					});
+				}
+				$(".btnOkSuccess").click(function(event) {
+					location.reload();
+				});
+			})
+			.fail(function() {
+				console.log("error");
+			})
+			.always(function() {
+				console.log("complete");
+			});
+	});
+</script>
+	<div class="section"></div>
+
+	<div class="container-fluid full noMargMin noScrollX">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="homeSliderWrapp">
+
+					<div class="homeSlider slick-initialized slick-slider"><button type="button" data-role="none" class="slick-prev slick-arrow" aria-label="Previous" role="button" style="display: inline-block;">Previous</button>
+																					<div aria-live="polite" class="slick-list draggable"><div class="slick-track" role="listbox" style="opacity: 1; width: 10928px; left: -3180.5px;"><div class="slide slick-slide slick-cloned" style="background-image: url(&quot;uploads/slideshow/68/imagenes/fanton_slider.jpg&quot;); width: 1366px;" data-slick-index="-1" aria-hidden="true" tabindex="-1"></div><div class="slide slick-slide" style="background-image: url(&quot;uploads/slideshow/57/imagenes/slider_monro_matic.jpg&quot;); width: 1366px;" data-slick-index="0" aria-hidden="true" tabindex="-1" role="option" aria-describedby="slick-slide00"></div><div class="slide slick-slide" style="background-image: url(&quot;uploads/slideshow/37/imagenes/1.jpg&quot;); width: 1366px;" data-slick-index="1" aria-hidden="true" tabindex="-1" role="option" aria-describedby="slick-slide01"></div><div class="slide slick-slide slick-current slick-active" style="background-image: url(&quot;uploads/slideshow/38/imagenes/1.jpg&quot;); width: 1366px;" data-slick-index="2" aria-hidden="false" tabindex="-1" role="option" aria-describedby="slick-slide02"></div><div class="slide slick-slide" style="background-image: url(&quot;uploads/slideshow/39/imagenes/1.jpg&quot;); width: 1366px;" data-slick-index="3" aria-hidden="true" tabindex="-1" role="option" aria-describedby="slick-slide03"></div><div class="slide slick-slide" style="background-image: url(&quot;uploads/slideshow/67/imagenes/slider_btp.jpg&quot;); width: 1366px;" data-slick-index="4" aria-hidden="true" tabindex="-1" role="option" aria-describedby="slick-slide04"></div><div class="slide slick-slide" style="background-image: url(&quot;uploads/slideshow/68/imagenes/fanton_slider.jpg&quot;); width: 1366px;" data-slick-index="5" aria-hidden="true" tabindex="-1" role="option" aria-describedby="slick-slide05"></div><div class="slide slick-slide slick-cloned" style="background-image: url(&quot;uploads/slideshow/57/imagenes/slider_monro_matic.jpg&quot;); width: 1366px;" data-slick-index="6" aria-hidden="true" tabindex="-1"></div></div></div>
+																												
+																												
+																												
+																												
+																												
+																		<button type="button" data-role="none" class="slick-next slick-arrow" aria-label="Next" role="button" style="display: inline-block;">Next</button></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="section "></div>
+	
+<div class="seccProd">
+	<a href="productos.php" class="seccProdCeld color"><img src="gfx/icon-instit-4-blanco.png" class="iconsp kavigo" alt=""><div class="txt">Productos</div></a>
+			
+
+
+	<a href="productos.php?novedad=1" class="seccProdCeld color">
+		<img src="gfx/icon-serv-1-blanco.png" class="iconsp kavigo" alt="">
+		<div class="flota-div-prods" style="left: 29%; top: 18%;">
+			6		</div>
+		<div class="txt">Nuevos productos</div>
+	</a>
+
+
+
+	<a href="novedades_listado.php" class="seccProdCeld color"><img src="gfx/icon-cont-blanco.png" class="iconsp kavigo" alt="">
+		<div class="flota-div-prods" style="left: 29%; top: 18%;">
+		6		</div>
+		<div class="txt">Noticias</div>
+	</a>
+	<a href="servicios.php" class="seccProdCeld color"><img src="gfx/icon-instit-3-blanco.png" class="iconsp kavigo" alt=""><div class="txt">Servicios</div></a>
+	<a href="institucional4.php" class="seccProdCeld color"><img src="gfx/icon-instit-1-blanco.png" class="iconsp kavigo" alt=""><div class="txt">Política de calidad</div></a>
+	<a href="servicios2.php" class="seccProdCeld color"><img src="gfx/icon-serv-2-blanco.png" class="iconsp kavigo" alt=""><div class="txt">Distribución</div></a>
+</div>
+	<div class="separa-40"></div>
+
+	<div class="container-fluid full">
+		<div class="row">
+			<div class="col-md-12">
+				<h2 class="tit-2 home">Noticias destacadas</h2>
+			</div>
+		</div>
+	</div>
+
+	<div class="separa-30"></div>
+
+		<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<span class="sep sep20"></span>
+				<div class="novList row wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.0s" style="visibility: hidden; animation-duration: 1s; animation-delay: 0s; animation-name: none;">
+											<div class="colNov col-md-3">
+							<div class="nov">
+								
+								<a class="photo" href="novedades_int.php?id=3" style="height: 262px; background-image: url('uploads/noticias/3/imagenes/1_ficha.jpg')"></a>
+
+								<a href="novedades_int.php?id=3" class="descr">
+									<h3>Incremento de Precios</h3>
+									<p class="rev-text">Aumentos Noviembre:
+02/11/26
+- Amortiguadores nacionales e importados aumento no lineal
+- Parrillas Moog (PM) y Monro<br></p>
+
+								</a>
+							</div>
+						</div>
+											<div class="colNov col-md-3">
+							<div class="nov">
+								
+								<a class="photo" href="novedades_int.php?id=39" style="height: 262px; background-image: url('uploads/noticias/39/imagenes/1_ficha.jpg')"></a>
+
+								<a href="novedades_int.php?id=39" class="descr">
+									<h3>Novedades VTH</h3>
+									<p class="rev-text">Se podran descargar archivos PDF con nuevas incorporaciones y/o novedades de productos de la linea VTH.<br></p>
+
+								</a>
+							</div>
+						</div>
+											<div class="colNov col-md-3">
+							<div class="nov">
+								
+								<a class="photo" href="novedades_int.php?id=59" style="height: 262px; background-image: url('uploads/noticias/59/imagenes/sin_titulo_1_ficha.jpg')"></a>
+
+								<a href="novedades_int.php?id=59" class="descr">
+									<h3>TENSORES BTP (CA)</h3>
+									<p class="rev-text">Liquidación de tensores de distribución línea BPT (CA). 
+Válido hasta agotar stock.<br></p>
+
+								</a>
+							</div>
+						</div>
+											<div class="colNov col-md-3">
+							<div class="nov">
+								
+								<a class="photo" href="novedades_int.php?id=61" style="height: 262px; background-image: url('uploads/noticias/61/imagenes/fanton1_ficha.jpg')"></a>
+
+								<a href="novedades_int.php?id=61" class="descr">
+									<h3>FANTON (FN)</h3>
+									<p class="rev-text">Incorporamos nueva línea de suspensión!!!
+Fanton Dirección y Suspensión es una marca argent<br></p>
+
+								</a>
+							</div>
+						</div>
+									</div>
+			</div>
+		</div>
+	</div>
+	
+		<a href="https://wa.me/541158294357?text=Hola!" target="_blank">
+		<div class="whatsappme whatsappme--right whatsappme--show">
+			<div class="whatsappme__button">
+				<svg width="24" height="24" viewBox="0 0 24 24">
+					<path id="wa_ico" fill="currentColor" d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"></path>
+					<path id="send_ico" fill="currentColor" d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"></path>
+				</svg>
+				<div class="whatsappme__badge whatsappme__badge--in">1</div>
+			</div>
+		</div>
+	</a>
+	<script src="js/whatsappme.min.js"></script>
+
+	<!-- FOOTER -->
+<div class="section"></div>
+
+<footer>
+	<div class="container">
+		<div class="row">
+			<div class="col col-md-12">
+				<img src="gfx/brandw.png" class="brandFooter" alt="">
+			</div>
+		</div>
+		<div class="row">
+			<div class="col col-md-4">
+				<p>
+					2026® Todos los derechos reservados Kavigo S.A<br>
+					Saladillo 2050/52 (C1440FFP) <br>
+					Capital Federal - Bs.As. - Argentina<br>
+					Tel: 2090-3333 (línea rotativa) <br> 2144-9298 / 7515-8682 / 7529-5599<br>
+					WhatsApp: 11 5829-4357 / 11 2287-8884<br>
+					Fax: 0-800-666-3575<br>
+					info@kavigo.net / pedidos@kavigo.net<br>
+					<br><br>
+				</p>
+			</div>
+			<div class="col col-md-5">
+				<ul class="ulGenLight">
+					<li><a href="quienes_somos.php">Institucional</a></li>
+					<li><a href="productos.php">Productos</a></li>
+					<li><a href="marcas.php">Marcas</a></li>
+					<li><a href="servicios.php">Servicios</a></li>
+					<li><a href="registro_precios.php">Lista de precios</a></li>
+					<li><a href="registro_compra.php">Compra rápida</a></li>
+					<li><a href="contacto.php">Contacto</a></li>
+				</ul>
+			</div>
+			<div class="col col-md-2 onlyMobile">
+				<ul class="ulGenLight">
+					<li class="bold"><a href="#">Contacto</a></li>
+				</ul>
+			</div>
+			<div class="col col-md-3">
+				<div class="social">
+					<a href="https://www.facebook.com/KAVIGO-SA-139451479409253/" target="_blank"><img src="gfx/icon_bord_black_facebook.png" alt=""></a>
+				</div>
+				<br>
+				<div class="defensa">
+					<p><a href="http://www.buenosaires.gob.ar/defensaconsumidor" target="_blank"><b>Defensa al consumidor</b></a></p>
+				</div>
+			</div>
+		</div>
+	</div>
+</footer>
+
+
+</body></html>
