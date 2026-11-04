@@ -15,7 +15,6 @@ class Proveedor4wd(FlujoWebMixin, BaseProveedor):
     def pasos(self, page, cfg):
         # En la planilla figura "www.4wdcom.ar": se prueban las dos variantes
         page = self.login(page, cfg, ["https://www.4wd.com.ar", "https://www.4wdcom.ar"])
-        # page = self.buscar_articulo(page, cfg, cfg.get("articulo_busqueda", "AN1067"))
         if cfg.get("download_page"):
             # URL directa de la búsqueda (más confiable que usar el buscador)
             self.ir_a(page, cfg["download_page"])

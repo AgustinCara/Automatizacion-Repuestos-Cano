@@ -53,7 +53,6 @@ def _configurar_navegadores_playwright() -> None:
 _configurar_navegadores_playwright()
 
 from proveedores import PROVEEDORES, PROVEEDORES_DIR, cargar_proveedores
-from dialog_proveedor import VentanaAgregarProveedor
 from tkinter import messagebox
 
 
@@ -239,8 +238,8 @@ class App(ctk.CTk):
 
         ctk.CTkButton(
             btn_frame,
-            text="➕ Agregar Proveedor",
-            command=self._abrir_asistente_proveedor,
+            text="➕ Agregar proveedor",
+            command=self._importar_proveedor,
             height=34,
             fg_color=C_ACCENT2,
             hover_color=C_ACCENT,
@@ -249,20 +248,12 @@ class App(ctk.CTk):
             corner_radius=8,
         ).grid(row=1, column=0, columnspan=2, padx=0, pady=(6, 0), sticky="ew")
 
-        ctk.CTkButton(
+        ctk.CTkLabel(
             btn_frame,
-            text="📥 Importar módulo .py",
-            command=self._importar_proveedor,
-            height=28,
-            fg_color="transparent",
-            hover_color=C_BORDER,
+            text="Elegí el archivo del proveedor que te enviaron",
             text_color=C_TEXT_DIM,
             font=ctk.CTkFont(size=10),
-            corner_radius=6,
-        ).grid(row=2, column=0, columnspan=2, padx=0, pady=(4, 0), sticky="ew")
-
-
-
+        ).grid(row=2, column=0, columnspan=2, padx=0, pady=(2, 0), sticky="ew")
 
         # ── Versión ────────────────────────────────────────────────────────
         ctk.CTkLabel(
@@ -656,102 +647,90 @@ class App(ctk.CTk):
             )
             cb.grid(row=0, column=0, sticky="w", padx=(6, 0))
 
-            nombre_clave = getattr(ClaseProveedor, "nombre_clave", "")
-            btn_del = ctk.CTkButton(
-                row_frame,
-                text="🗑",
-                width=24,
-                height=24,
-                fg_color="transparent",
-                hover_color="#fee2e2",
-                text_color="#ef4444",
-                font=ctk.CTkFont(size=12),
-                corner_radius=4,
-                command=lambda disp=nombre_display, k=nombre_clave: self._eliminar_proveedor(disp, k),
-            )
-            btn_del.grid(row=0, column=1, sticky="e", padx=(4, 6))
-
         self._check_vars = nuevas_vars
 
-    def _abrir_asistente_proveedor(self):
-        """Abre la ventana modal del asistente para configurar un nuevo proveedor."""
-        VentanaAgregarProveedor(
-            master=self,
-            base_dir=_BASE_DIR,
-            config_path=_CONFIG_PATH,
-            on_success_callback=self._on_proveedor_agregado,
-        )
-
-    def _on_proveedor_agregado(self, nombre_display: str, nombre_clave: str):
-        """Callback invocado cuando el asistente agrega exitosamente un nuevo proveedor."""
-        self._cfg = _leer_config()
-        self._render_provider_checkboxes()
-        self._log_append(f"✨ Proveedor '{nombre_display}' configurado y agregado al sistema.\n", tag="success")
-
-
-    def _eliminar_proveedor(self, nombre_display: str, nombre_clave: str):
-        """Confirma y elimina la configuración y el archivo de un proveedor."""
-        confirm = messagebox.askyesno(
-            "Confirmar eliminación",
-            f"¿Estás seguro de que querés eliminar el proveedor '{nombre_display}'?",
-            parent=self,
-        )
-        if not confirm:
-            return
-
-        # 1. Eliminar de config.json
-        if _CONFIG_PATH.exists():
-            try:
-                with open(_CONFIG_PATH, "r", encoding="utf-8") as f:
-                    cfg_data = json.load(f)
-                if "proveedores" in cfg_data and nombre_clave in cfg_data["proveedores"]:
-                    del cfg_data["proveedores"][nombre_clave]
-                    with open(_CONFIG_PATH, "w", encoding="utf-8") as f:
-                        json.dump(cfg_data, f, indent=2, ensure_ascii=False)
-            except Exception as e:
-                self._log_append(f"⚠ No se pudo eliminar la config de '{nombre_display}': {e}\n", tag="warning")
-
-        # 2. Eliminar archivo Python de proveedores/
-        if nombre_clave:
-            archivo_py = PROVEEDORES_DIR / f"proveedor_{nombre_clave}.py"
-            if archivo_py.exists():
-                try:
-                    archivo_py.unlink()
-                except Exception as e:
-                    self._log_append(f"⚠ No se pudo borrar el archivo {archivo_py.name}: {e}\n", tag="warning")
-
-        # 3. Refrescar UI
-        self._render_provider_checkboxes()
-        self._log_append(f"🗑 Proveedor '{nombre_display}' eliminado.\n", tag="dim")
-
     def _importar_proveedor(self):
-        """Abre un cuadro de diálogo para importar y registrar un nuevo módulo .py de proveedor."""
+        """Agrega (o actualiza) un proveedor a partir del archivo .py que envía el desarrollador."""
+        import shutil
+
         archivo = filedialog.askopenfilename(
-            title="Seleccionar módulo de proveedor (.py)",
-            filetypes=[("Archivos Python", "*.py"), ("Todos los archivos", "*.*")]
+            title="Elegí el archivo del proveedor (proveedor_xxx.py)",
+            filetypes=[("Archivo de proveedor", "*.py")],
+            parent=self,
         )
         if not archivo:
             return
-
         origen = Path(archivo)
-        if not origen.exists():
-            return
-
         destino = PROVEEDORES_DIR / origen.name
+        existia = destino.exists()
+        respaldo = destino.with_suffix(".py.bak") if existia else None
 
         try:
-            import shutil
+            if existia:
+                shutil.copy2(destino, respaldo)
             shutil.copy2(origen, destino)
 
-            proveedores = cargar_proveedores()
-            self._render_provider_checkboxes()
+            clases = self._clases_del_modulo(destino)
+            if not clases:
+                raise ValueError("el archivo no contiene un proveedor válido")
 
-            self._log_append(f"📦 Módulo de proveedor '{origen.name}' importado con éxito.\n", tag="success")
-            self._log_append(f"   Total de proveedores disponibles: {len(proveedores)}\n", tag="accent")
+            for clase in clases:
+                self._cargar_config_inicial(clase)
+
+            if respaldo:
+                respaldo.unlink(missing_ok=True)
+            self._render_provider_checkboxes()
+            nombres = ", ".join(c.get_nombre_display() for c in clases)
+            accion = "actualizado" if existia else "agregado"
+            self._log_append(f"📦 Proveedor {accion}: {nombres}\n", tag="success")
+            messagebox.showinfo("Proveedor " + accion, f"Listo: {nombres} ya está disponible.", parent=self)
 
         except Exception as e:
-            self._log_append(f"❌ Error al importar el proveedor '{origen.name}': {e}\n", tag="error")
+            # Volver a dejar todo como estaba
+            if respaldo and respaldo.exists():
+                shutil.move(str(respaldo), str(destino))
+            elif not existia:
+                destino.unlink(missing_ok=True)
+            self._render_provider_checkboxes()
+            self._log_append(f"❌ No se pudo agregar '{origen.name}': {e}\n", tag="error")
+            messagebox.showerror(
+                "No se pudo agregar el proveedor",
+                f"El archivo '{origen.name}' no se pudo agregar.\n\n{e}",
+                parent=self,
+            )
 
+    def _clases_del_modulo(self, archivo_py: Path) -> list:
+        """Carga el .py y devuelve las clases de proveedor que define."""
+        import importlib.util
+        import inspect
+        from proveedores.base import BaseProveedor
+
+        spec = importlib.util.spec_from_file_location(f"proveedores.{archivo_py.stem}", archivo_py)
+        modulo = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(modulo)
+        return [
+            c for _, c in inspect.getmembers(modulo, inspect.isclass)
+            if issubclass(c, BaseProveedor) and c is not BaseProveedor and c.__module__ == modulo.__name__
+        ]
+
+    def _cargar_config_inicial(self, clase) -> None:
+        """Copia el 'config_inicial' del proveedor a config.json sin pisar datos existentes."""
+        datos = getattr(clase, "config_inicial", None) or {}
+        if not datos:
+            return
+        cfg = _leer_config()
+        actual = cfg.setdefault("proveedores", {}).setdefault(clase.nombre_clave, {})
+        nuevos = [k for k in datos if k not in actual]
+        if not nuevos:
+            return
+        for k in nuevos:
+            actual[k] = datos[k]
+        _guardar_config(cfg)
+        self._cfg = cfg
+        self._log_append(
+            f"⚙ Configuración de '{clase.get_nombre_display()}' guardada ({', '.join(nuevos)}).\n",
+            tag="accent",
+        )
 
 
 # ══════════════════════════════════════════════════════════════════════════════

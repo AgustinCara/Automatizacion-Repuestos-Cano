@@ -1,2 +1,0 @@
-URL: about:blank
-Error: Faltan 'usuario' y/o 'password' en config.json -> proveedores.cedicor

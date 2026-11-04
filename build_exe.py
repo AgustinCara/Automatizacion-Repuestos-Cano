@@ -112,7 +112,6 @@ def build():
         "proveedores._slaweb",
         "openpyxl",
         "xlrd",
-        "dialog_proveedor",
     ]
     for imp in hidden_imports:
         pyinstaller_args += ["--hidden-import", imp]

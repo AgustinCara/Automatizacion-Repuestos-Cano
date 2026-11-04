@@ -86,6 +86,16 @@ def _texto_ok(texto: str, excluir: list[str] | None) -> bool:
     return not any(rx(x).search(texto or "") for x in excluir)
 
 
+def nombre_original(content_disposition: str, url: str) -> str:
+    """Nombre con el que el sitio entrega el archivo (encabezado o final de la URL)."""
+    m = re.search(r"filename\*?=(?:UTF-8'')?[\"']?([^\"';]+)", content_disposition or "", re.IGNORECASE)
+    if m:
+        nombre = Path(unquote(m.group(1).strip())).name
+        if nombre:
+            return nombre
+    return Path(unquote(urlparse(url or "").path)).name or "archivo"
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Conversión de Excel a CSV (usada por Cedicor)
 # ─────────────────────────────────────────────────────────────────────────────
@@ -190,8 +200,32 @@ def excel_a_csv(origen: Path, destino: Path, separador=";", decimal=",", encodin
 class FlujoWebMixin:
     """Poner ANTES de BaseProveedor:  class ProveedorX(FlujoWebMixin, BaseProveedor)."""
 
+    # False = descarga directa por HTTP, sin abrir navegador (más rápido).
+    # En ese caso pasos() recibe page=None y usa bajar_http / buscar_link_http.
+    usa_navegador: bool = True
+
     def pasos(self, page, cfg: dict) -> str:  # pragma: no cover - lo implementa cada proveedor
         raise NotImplementedError
+
+    def al_terminar(self, page) -> None:
+        """Se ejecuta siempre al final (haya error o no). Ej.: cerrar sesión."""
+
+    def nombre_descargado(self, tmp) -> str:
+        """Nombre original con el que el sitio entregó el archivo."""
+        nombre = Path(tmp).name
+        prefijo = f"_tmp_{self.nombre_clave}_"
+        return nombre[len(prefijo):] if nombre.startswith(prefijo) else nombre
+
+    def texto_en_pagina(self, page, textos) -> str | None:
+        """Devuelve el primer texto de la lista que aparezca en la página (o None)."""
+        try:
+            contenido = sin_acentos(page.inner_text("body", timeout=5000)).lower()
+        except Exception:
+            return None
+        for t in textos:
+            if sin_acentos(t).lower() in contenido:
+                return t
+        return None
 
     # ── Punto de entrada que llama la app ────────────────────────────────────
     def descargar(self, directorio_destino: str | Path, headless: bool = True) -> str:
@@ -203,6 +237,19 @@ class FlujoWebMixin:
         if cfg.get("mostrar_navegador", glob.get("mostrar_navegador", False)):
             headless = False
         timeout = int(cfg.get("timeout_ms", glob.get("timeout_ms", 30000)))
+        self._page = None
+        self._http = None
+
+        if not self.usa_navegador:
+            self.log("Descarga directa (sin navegador)...")
+            try:
+                ruta = self.pasos(None, cfg)
+                self.log(f"OK -> {ruta}")
+                return ruta
+            except ProveedorError:
+                raise
+            except Exception as e:
+                raise ProveedorError(f"{type(e).__name__}: {e}") from e
 
         self.log("Iniciando navegador...")
         with sync_playwright() as p:
@@ -238,12 +285,18 @@ class FlujoWebMixin:
                 raise ProveedorError(msg) from e
             finally:
                 try:
+                    self.al_terminar(self._page or page)
+                except Exception:
+                    pass
+                try:
                     browser.close()
                 except Exception:
                     pass
 
     # ── Diagnóstico ──────────────────────────────────────────────────────────
     def _diagnostico(self, motivo: str) -> None:
+        if self._page is None:
+            return
         try:
             carpeta = self._destino / "_diagnostico"
             carpeta.mkdir(exist_ok=True)
@@ -327,13 +380,15 @@ class FlujoWebMixin:
                 """(pwd) => {
                     const vis = e => !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length)
                                     && getComputedStyle(e).visibility !== 'hidden';
-                    const all = Array.from(document.querySelectorAll('input'));
-                    for (let i = all.indexOf(pwd) - 1; i >= 0; i--) {
-                        const e = all[i], t = (e.type || 'text').toLowerCase();
-                        if (['text','email','tel','number'].includes(t) && vis(e) && !e.disabled && !e.readOnly) {
-                            e.setAttribute('data-cano-usuario', '1'); return true;
-                        }
-                    }
+                    const malos = ['hidden','password','checkbox','radio','submit','button',
+                                   'file','image','reset','search'];
+                    const ok = e => (e.tagName === 'SELECT' || !malos.includes((e.type || 'text').toLowerCase()))
+                                    && vis(e) && !e.disabled && !e.readOnly;
+                    const all = Array.from(document.querySelectorAll('input, select'));
+                    const i = all.indexOf(pwd);
+                    // primero los campos ANTES de la contraseña, después los que vienen DESPUÉS
+                    const e = all.slice(0, i).reverse().concat(all.slice(i + 1)).find(ok);
+                    if (e) { e.setAttribute('data-cano-usuario', '1'); return true; }
                     return false;
                 }"""
             )
@@ -342,7 +397,10 @@ class FlujoWebMixin:
             campo_user = frame.locator("[data-cano-usuario='1']").first
 
         self.log("Completando usuario y contraseña...")
-        campo_user.fill(usuario)
+        if campo_user.evaluate("e => e.tagName") == "SELECT":
+            campo_user.select_option(label=usuario)
+        else:
+            campo_user.fill(usuario)
         pwd.fill(password)
         if cfg.get("selector_ingresar"):
             frame.locator(cfg["selector_ingresar"]).first.click()
@@ -626,23 +684,43 @@ class FlujoWebMixin:
             return tmp
         return None
 
-    def _descargar_con(self, page, accion, timeout=90000):
+    def _links_archivo(self, page, extensiones) -> set:
+        """URLs de los links de la página que terminan en alguna de las extensiones."""
+        urls = set()
+        for frame in page.frames:
+            try:
+                hrefs = frame.eval_on_selector_all("a[href]", "els => els.map(e => e.href)")
+            except Exception:
+                continue
+            for h in hrefs:
+                ruta = unquote(urlparse(h or "").path).lower()
+                if any(ruta.endswith("." + e.lower()) for e in extensiones):
+                    urls.add(h)
+        return urls
+
+    def _descargar_con(self, page, accion, timeout=90000, extensiones=()):
         tmp = self._tomar_descarga()
         if tmp:
             return tmp
+        antes = self._links_archivo(page, extensiones) if extensiones else set()
         accion()
         fin = time.time() + timeout / 1000
         while time.time() < fin:
             tmp = self._tomar_descarga()
             if tmp:
                 return tmp
+            # Algunos sitios generan el archivo y muestran un link nuevo en vez de bajarlo
+            if extensiones:
+                nuevos = self._links_archivo(page, extensiones) - antes
+                if nuevos:
+                    return self._bajar_url(page, sorted(nuevos)[0])
             for pg in page.context.pages:
                 if self._parece_archivo(pg.url):
                     return self._bajar_url(pg, pg.url)
             page.wait_for_timeout(500)
         raise ProveedorError("Se hizo clic pero la descarga no comenzó")
 
-    def _descargar_elemento(self, page, el, timeout=90000):
+    def _descargar_elemento(self, page, el, timeout=90000, extensiones=()):
         href = None
         try:
             href = el.get_attribute("href", timeout=2000)
@@ -650,13 +728,14 @@ class FlujoWebMixin:
             pass
         usable = href and not href.startswith(("javascript", "#"))
         try:
-            return self._descargar_con(page, lambda: el.click(), timeout=20000 if usable else timeout)
+            return self._descargar_con(page, lambda: el.click(),
+                                       timeout=20000 if usable else timeout, extensiones=extensiones)
         except ProveedorError:
             if usable:
                 return self._bajar_url(page, urljoin(page.url, href))
             raise
 
-    def _mejor_link(self, page, extensiones, pistas, excluir=None):
+    def _mejor_link(self, page, extensiones, pistas, excluir=None, minimo=5):
         mejor = (0, None)
         for frame in page.frames:
             try:
@@ -678,14 +757,15 @@ class FlujoWebMixin:
                     punt += 2
                 if punt > mejor[0]:
                     mejor = (punt, frame.locator("a[href]").nth(i))
-        return mejor[1] if mejor[0] >= 5 else None
+        return mejor[1] if mejor[0] >= minimo else None
 
     def bajar_archivo(self, page, extensiones, pistas=(), textos=(), menus_previos=(),
                       excluir=None, timeout=90000):
         """
         Encuentra y descarga el archivo. Prueba en orden:
-          1. botones/links con alguno de 'textos' (el más específico primero)
-          2. el link que mejor coincide por extensión/pistas
+          1. un link que termine en la extensión del archivo (.xls, .dbf...)
+          2. botones/links con alguno de 'textos' (el más específico primero)
+          3. el link que mejor coincide por pistas
           3. si no aparece, hace clic en 'menus_previos' y vuelve a buscar
         """
         pendientes = list(menus_previos)
@@ -694,7 +774,11 @@ class FlujoWebMixin:
             tmp = self._tomar_descarga()  # un clic anterior ya pudo disparar la descarga
             if tmp:
                 return tmp
-            el = self._encontrar(page, list(textos), excluir) if textos else None
+            # 1) un link que termina en la extensión del archivo gana siempre
+            el = self._mejor_link(page, extensiones, pistas, excluir, minimo=10)
+            # 2) botones/links con los textos indicados  3) links parecidos
+            if el is None and textos:
+                el = self._encontrar(page, list(textos), excluir)
             if el is None:
                 el = self._mejor_link(page, extensiones, pistas, excluir)
             if el is not None:
@@ -703,7 +787,7 @@ class FlujoWebMixin:
                 except Exception:
                     etiqueta = "?"
                 self.log(f"Descargando desde '{etiqueta}'...")
-                return self._descargar_elemento(page, el, timeout)
+                return self._descargar_elemento(page, el, timeout, extensiones)
             if time.time() > fin:
                 if not pendientes:
                     break
@@ -714,6 +798,57 @@ class FlujoWebMixin:
         raise ProveedorError(
             f"No se encontró el archivo para descargar ({', '.join(extensiones)})"
         )
+
+    # ── Descarga directa por HTTP (sin navegador) ───────────────────────────
+    def _sesion_http(self):
+        if self._http is None:
+            import requests
+            self._http = requests.Session()
+            self._http.headers["User-Agent"] = (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            )
+        return self._http
+
+    def buscar_link_http(self, pagina_url: str, extensiones) -> str | None:
+        """Lee una página y devuelve el primer link que termine en alguna extensión."""
+        try:
+            self.log(f"Consultando página: {pagina_url}")
+            r = self._sesion_http().get(pagina_url, timeout=20)
+            r.raise_for_status()
+        except Exception as e:  # noqa: BLE001
+            self.log(f"Aviso: no se pudo leer la página ({e})")
+            return None
+        exts = "|".join(re.escape(e.lstrip(".")) for e in extensiones)
+        m = re.search(rf"href=[\"']([^\"']*\.(?:{exts}))[\"']", r.text, re.IGNORECASE)
+        if not m:
+            self.log("No se encontró el link en la página.")
+            return None
+        url = urljoin(pagina_url, m.group(1))
+        self.log(f"Link encontrado: {url}")
+        return url
+
+    def bajar_http(self, url: str, referer: str | None = None):
+        """Descarga por HTTP. Devuelve (archivo temporal, nombre original del archivo)."""
+        import requests
+        self.log(f"Descargando {url}")
+        try:
+            r = self._sesion_http().get(
+                url, timeout=120, stream=True, headers={"Referer": referer} if referer else None
+            )
+            r.raise_for_status()
+        except requests.RequestException as e:
+            raise ProveedorError(f"Error HTTP al descargar: {e}") from e
+        nombre = nombre_original(r.headers.get("Content-Disposition", ""), r.url)
+        tmp = self._destino / f"_tmp_{self.nombre_clave}_{nombre}"
+        total = 0
+        with open(tmp, "wb") as f:
+            for chunk in r.iter_content(chunk_size=65536):
+                if chunk:
+                    f.write(chunk)
+                    total += len(chunk)
+        self.log(f"Descargado {nombre} ({total / 1024:.1f} KB)")
+        return tmp, nombre
 
     # ── Guardado final ───────────────────────────────────────────────────────
     def guardar_final(self, tmp: Path, nombre_salida: str, acepta_html=False) -> str:

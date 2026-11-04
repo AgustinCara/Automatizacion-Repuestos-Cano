@@ -141,7 +141,13 @@ class BaseProveedor(ABC):
         Retorna el bloque de configuración específico de este proveedor
         desde config.json (clave == self.nombre_clave).
         """
-        return self.cfg.get("proveedores", {}).get(self.nombre_clave, {})
+        provs = self.cfg.get("proveedores", {})
+        if self.nombre_clave in provs:
+            return provs[self.nombre_clave]
+        for clave, datos in provs.items():  # no distingue mayúsculas ("4WD" = "4wd")
+            if clave.lower() == self.nombre_clave.lower():
+                return datos
+        return {}
 
     def descomprimir_si_es_zip(self, ruta_archivo: str | Path, borrar_zip: bool = True) -> str:
         """
