@@ -29,6 +29,7 @@ class ProveedorNuevo(FlujoWebMixin, BaseProveedor):  # <<< cambiar "Nuevo" por e
         "usuario": "",                             # <<<
         "password": "",                            # <<<
         "nombre_archivo": "lista.txt",             # <<< nombre con que se guarda
+        "carpeta": ""
         # Opcionales:
         # "download_page": "https://...",          # ir directo a la página del archivo
         # "selector_usuario": "input[name='usuario']",  # si no encuentra el campo usuario

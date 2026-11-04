@@ -298,8 +298,8 @@ class FlujoWebMixin:
         if self._page is None:
             return
         try:
-            carpeta = self._destino / "_diagnostico"
-            carpeta.mkdir(exist_ok=True)
+            carpeta = Path(getattr(self, "carpeta_diagnostico", None) or self._destino / "_diagnostico")
+            carpeta.mkdir(parents=True, exist_ok=True)
             base = carpeta / f"{self.nombre_clave}_{datetime.now():%Y%m%d_%H%M%S}"
             pg = self._page
             pg.screenshot(path=str(base) + ".png", full_page=True)
@@ -320,6 +320,10 @@ class FlujoWebMixin:
         """Abre la primera URL que cargue (acepta una o varias)."""
         if isinstance(urls, str):
             urls = [urls]
+        # Si un sitio no responde por https, probar también por http
+        extra = [u.replace("https://", "http://", 1) for u in urls
+                 if u and u.startswith("https://")]
+        urls = list(urls) + [u for u in extra if u not in urls]
         ultimo = None
         for url in urls:
             if not url:
@@ -874,8 +878,8 @@ class FlujoWebMixin:
             tipo = tipo_real(tmp)
 
         if tipo == "html" and not (acepta_html or ext_esperada == "xls"):
-            diag = self._destino / "_diagnostico"
-            diag.mkdir(exist_ok=True)
+            diag = Path(getattr(self, "carpeta_diagnostico", None) or self._destino / "_diagnostico")
+            diag.mkdir(parents=True, exist_ok=True)
             mal = diag / f"{self.nombre_clave}_descarga_era_pagina.html"
             tmp.replace(mal)
             raise ProveedorError(

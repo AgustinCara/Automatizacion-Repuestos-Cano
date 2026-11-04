@@ -92,6 +92,59 @@ _CONFIG_PATH = _BASE_DIR / "config.json"
 # HELPERS
 # ══════════════════════════════════════════════════════════════════════════════
 
+def _normalizar_nombre(texto: str) -> str:
+    """'Distem S.R.L.' -> 'distemsrl' (sin acentos, espacios ni signos)."""
+    import unicodedata
+    t = unicodedata.normalize("NFD", texto or "")
+    t = "".join(c for c in t if unicodedata.category(c) != "Mn")
+    return "".join(c for c in t.lower() if c.isalnum())
+
+
+def _carpeta_del_proveedor(base: str, clase) -> tuple[Path, str]:
+    """
+    Carpeta donde se guarda el archivo de un proveedor, dentro de la carpeta base.
+
+      1. Si en config.json el proveedor tiene "carpeta", se usa esa
+         (nombre de subcarpeta, o ruta completa).
+      2. Si no, se busca dentro de la base una subcarpeta con el nombre del
+         proveedor (sin importar mayúsculas, acentos ni signos: "DISTEM",
+         "Distem S.R.L." y "distem" coinciden).
+      3. Si no hay ninguna, se guarda en la carpeta base y se avisa.
+
+    Devuelve (carpeta, estado) con estado = "config" | "encontrada" | "no_encontrada".
+    """
+    base_p = Path(base)
+    provs = _leer_config().get("proveedores", {})
+    cfg_p = provs.get(clase.nombre_clave) or next(
+        (v for k, v in provs.items() if k.lower() == clase.nombre_clave.lower()), {}
+    )
+
+    if cfg_p.get("carpeta"):
+        carpeta = Path(cfg_p["carpeta"])
+        if not carpeta.is_absolute():
+            carpeta = base_p / carpeta
+        carpeta.mkdir(parents=True, exist_ok=True)
+        return carpeta, "config"
+
+    nombres = {
+        _normalizar_nombre(clase.nombre_clave),
+        _normalizar_nombre(clase.get_nombre_display()),
+        _normalizar_nombre(clase.get_nombre_display().split()[0]),
+    } - {""}
+    if base_p.is_dir():
+        subcarpetas = [d for d in base_p.iterdir() if d.is_dir() and not d.name.startswith("_")]
+        # coincidencia exacta
+        for d in subcarpetas:
+            if _normalizar_nombre(d.name) in nombres:
+                return d, "encontrada"
+        # coincidencia parcial: "DISTEMSRL" con "distem", "EXPOYER SA" con "expoyer"
+        for d in subcarpetas:
+            n = _normalizar_nombre(d.name)
+            if len(n) >= 3 and any(n.startswith(x) or x.startswith(n) for x in nombres if len(x) >= 3):
+                return d, "encontrada"
+    return base_p, "no_encontrada"
+
+
 def _leer_config() -> dict:
     if _CONFIG_PATH.exists():
         with open(_CONFIG_PATH, "r", encoding="utf-8") as f:
@@ -501,7 +554,16 @@ class App(ctk.CTk):
                 instancia = ClaseProveedor(
                     log_callback=lambda msg: self._encolar(f"   {msg}\n", "")
                 )
-                ruta = instancia.descargar(directorio)
+                carpeta, estado = _carpeta_del_proveedor(directorio, ClaseProveedor)
+                if estado == "no_encontrada":
+                    self._encolar(
+                        f"   ⚠ No hay carpeta para {nombre_display} dentro de {directorio}; "
+                        f"se guarda ahí. (Indicar \"carpeta\" en config.json)\n", "warning")
+                else:
+                    self._encolar(f"   Carpeta: {carpeta}\n", "dim")
+                # Las capturas de error van a la carpeta base, no a la del proveedor
+                instancia.carpeta_diagnostico = Path(directorio) / "_diagnostico"
+                ruta = instancia.descargar(str(carpeta))
                 exitosos += 1
                 self._encolar(f"   ✓ Completado: {ruta}\n", "success")
 
