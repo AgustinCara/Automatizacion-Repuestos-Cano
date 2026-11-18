@@ -354,9 +354,10 @@ class FlujoWebMixin:
         return None, None
 
     def login(self, page, cfg: dict, urls_por_defecto) -> object:
-        usuario = str(cfg.get("usuario", "")).strip()
-        password = str(cfg.get("password", "")).strip()
-        if not usuario or not password:
+        solo_password = bool(cfg.get("solo_password"))
+        usuario = str(cfg.get("usuario") or "").strip()
+        password = str(cfg.get("password") or "").strip()
+        if not password or (not usuario and not solo_password):
             raise ProveedorError(
                 f"Faltan 'usuario' y/o 'password' en config.json -> proveedores.{self.nombre_clave}"
             )
@@ -366,9 +367,17 @@ class FlujoWebMixin:
         frame, pwd = self._buscar_password(page, sel_pwd)
         if pwd is None:
             self.log("No se ve el formulario de ingreso, buscando el botón para abrirlo...")
-            nueva = self.clic_texto(page, cfg.get("textos_abrir_login") or TEXTOS_ABRIR_LOGIN,
-                                    obligatorio=False, timeout=8000)
-            page = nueva or page
+            sel_abrir = cfg.get("selector_abrir_login")
+            if sel_abrir:
+                # Botón/ícono sin texto (ej.: una llave): clic por selector CSS
+                try:
+                    page.locator(f"{sel_abrir} >> visible=true").first.click(timeout=10000)
+                except Exception as e:
+                    self.log(f"No se pudo hacer clic en 'selector_abrir_login': {e}")
+            else:
+                nueva = self.clic_texto(page, cfg.get("textos_abrir_login") or TEXTOS_ABRIR_LOGIN,
+                                        obligatorio=False, timeout=8000)
+                page = nueva or page
             fin = time.time() + 15
             while pwd is None and time.time() < fin:
                 page.wait_for_timeout(500)
@@ -376,35 +385,39 @@ class FlujoWebMixin:
         if pwd is None:
             raise ProveedorError("No se encontró el campo de contraseña en la página de ingreso")
 
-        # Campo usuario: el indicado en config o el input visible anterior a la contraseña
-        if cfg.get("selector_usuario"):
-            campo_user = frame.locator(cfg["selector_usuario"]).first
-        else:
-            ok = pwd.evaluate(
-                """(pwd) => {
-                    const vis = e => !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length)
-                                    && getComputedStyle(e).visibility !== 'hidden';
-                    const malos = ['hidden','password','checkbox','radio','submit','button',
-                                   'file','image','reset','search'];
-                    const ok = e => (e.tagName === 'SELECT' || !malos.includes((e.type || 'text').toLowerCase()))
-                                    && vis(e) && !e.disabled && !e.readOnly;
-                    const all = Array.from(document.querySelectorAll('input, select'));
-                    const i = all.indexOf(pwd);
-                    // primero los campos ANTES de la contraseña, después los que vienen DESPUÉS
-                    const e = all.slice(0, i).reverse().concat(all.slice(i + 1)).find(ok);
-                    if (e) { e.setAttribute('data-cano-usuario', '1'); return true; }
-                    return false;
-                }"""
-            )
-            if not ok:
-                raise ProveedorError("No se encontró el campo de usuario (cargar 'selector_usuario' en config.json)")
-            campo_user = frame.locator("[data-cano-usuario='1']").first
+        if not solo_password:
+            # Campo usuario: el indicado en config o el input visible anterior a la contraseña
+            if cfg.get("selector_usuario"):
+                campo_user = frame.locator(cfg["selector_usuario"]).first
+            else:
+                ok = pwd.evaluate(
+                    """(pwd) => {
+                        const vis = e => !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length)
+                                        && getComputedStyle(e).visibility !== 'hidden';
+                        const malos = ['hidden','password','checkbox','radio','submit','button',
+                                       'file','image','reset','search'];
+                        const ok = e => (e.tagName === 'SELECT' || !malos.includes((e.type || 'text').toLowerCase()))
+                                        && vis(e) && !e.disabled && !e.readOnly;
+                        const all = Array.from(document.querySelectorAll('input, select'));
+                        const i = all.indexOf(pwd);
+                        // primero los campos ANTES de la contraseña, después los que vienen DESPUÉS
+                        const e = all.slice(0, i).reverse().concat(all.slice(i + 1)).find(ok);
+                        if (e) { e.setAttribute('data-cano-usuario', '1'); return true; }
+                        return false;
+                    }"""
+                )
+                if not ok:
+                    raise ProveedorError("No se encontró el campo de usuario (cargar 'selector_usuario' en config.json)")
+                campo_user = frame.locator("[data-cano-usuario='1']").first
 
-        self.log("Completando usuario y contraseña...")
-        if campo_user.evaluate("e => e.tagName") == "SELECT":
-            campo_user.select_option(label=usuario)
+            self.log("Completando usuario y contraseña...")
+            if campo_user.evaluate("e => e.tagName") == "SELECT":
+                campo_user.select_option(label=usuario)
+            else:
+                campo_user.fill(usuario)
         else:
-            campo_user.fill(usuario)
+            self.log("Completando contraseña (sin usuario)...")
+
         pwd.fill(password)
         if cfg.get("selector_ingresar"):
             frame.locator(cfg["selector_ingresar"]).first.click()
@@ -434,6 +447,88 @@ class FlujoWebMixin:
         else:
             self.log("Ingreso realizado.")
         return page
+
+    # def login(self, page, cfg: dict, urls_por_defecto) -> object:
+    #     usuario = str(cfg.get("usuario", "")).strip()
+    #     password = str(cfg.get("password", "")).strip()
+    #     if not usuario or not password:
+    #         raise ProveedorError(
+    #             f"Faltan 'usuario' y/o 'password' en config.json -> proveedores.{self.nombre_clave}"
+    #         )
+    #     self.ir_a(page, cfg.get("login_url") or urls_por_defecto)
+
+    #     sel_pwd = cfg.get("selector_password")
+    #     frame, pwd = self._buscar_password(page, sel_pwd)
+    #     if pwd is None:
+    #         self.log("No se ve el formulario de ingreso, buscando el botón para abrirlo...")
+    #         nueva = self.clic_texto(page, cfg.get("textos_abrir_login") or TEXTOS_ABRIR_LOGIN,
+    #                                 obligatorio=False, timeout=8000)
+    #         page = nueva or page
+    #         fin = time.time() + 15
+    #         while pwd is None and time.time() < fin:
+    #             page.wait_for_timeout(500)
+    #             frame, pwd = self._buscar_password(page, sel_pwd)
+    #     if pwd is None:
+    #         raise ProveedorError("No se encontró el campo de contraseña en la página de ingreso")
+
+    #     # Campo usuario: el indicado en config o el input visible anterior a la contraseña
+    #     if cfg.get("selector_usuario"):
+    #         campo_user = frame.locator(cfg["selector_usuario"]).first
+    #     else:
+    #         ok = pwd.evaluate(
+    #             """(pwd) => {
+    #                 const vis = e => !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length)
+    #                                 && getComputedStyle(e).visibility !== 'hidden';
+    #                 const malos = ['hidden','password','checkbox','radio','submit','button',
+    #                                'file','image','reset','search'];
+    #                 const ok = e => (e.tagName === 'SELECT' || !malos.includes((e.type || 'text').toLowerCase()))
+    #                                 && vis(e) && !e.disabled && !e.readOnly;
+    #                 const all = Array.from(document.querySelectorAll('input, select'));
+    #                 const i = all.indexOf(pwd);
+    #                 // primero los campos ANTES de la contraseña, después los que vienen DESPUÉS
+    #                 const e = all.slice(0, i).reverse().concat(all.slice(i + 1)).find(ok);
+    #                 if (e) { e.setAttribute('data-cano-usuario', '1'); return true; }
+    #                 return false;
+    #             }"""
+    #         )
+    #         if not ok:
+    #             raise ProveedorError("No se encontró el campo de usuario (cargar 'selector_usuario' en config.json)")
+    #         campo_user = frame.locator("[data-cano-usuario='1']").first
+
+    #     self.log("Completando usuario y contraseña...")
+    #     if campo_user.evaluate("e => e.tagName") == "SELECT":
+    #         campo_user.select_option(label=usuario)
+    #     else:
+    #         campo_user.fill(usuario)
+    #     pwd.fill(password)
+    #     if cfg.get("selector_ingresar"):
+    #         frame.locator(cfg["selector_ingresar"]).first.click()
+    #     else:
+    #         pwd.press("Enter")
+    #     page.wait_for_timeout(2500)
+    #     self.esperar(page, 15000)
+
+    #     # Si el formulario sigue ahí, probar con el botón
+    #     _, pwd2 = self._buscar_password(page, sel_pwd)
+    #     if pwd2 is not None and not cfg.get("selector_ingresar"):
+    #         boton = self._encontrar(page, TEXTOS_BOTON_LOGIN, roles_solo=True)
+    #         if boton is None:
+    #             b = frame.locator("button[type=submit], input[type=submit]")
+    #             boton = b.first if b.count() else None
+    #         if boton is not None:
+    #             self.log("Enviando formulario con el botón de ingreso...")
+    #             try:
+    #                 boton.click()
+    #             except Exception:
+    #                 pass
+    #             page.wait_for_timeout(2500)
+    #             self.esperar(page, 15000)
+    #         _, pwd2 = self._buscar_password(page, sel_pwd)
+    #     if pwd2 is not None:
+    #         self.log("Aviso: el formulario de ingreso sigue visible. Si falla después, revisar usuario/contraseña.")
+    #     else:
+    #         self.log("Ingreso realizado.")
+    #     return page
 
     # ── Búsqueda y clic por texto ────────────────────────────────────────────
     def _encontrar(self, page, textos, excluir=None, roles_solo=False):

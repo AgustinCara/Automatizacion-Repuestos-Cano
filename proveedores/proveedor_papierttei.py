@@ -7,7 +7,7 @@ from proveedores.base import BaseProveedor
 from proveedores._web import FlujoWebMixin
 
 
-class Proveedor4wd(FlujoWebMixin, BaseProveedor):
+class ProveedorPapierttei(FlujoWebMixin, BaseProveedor):
     nombre_clave = "papierttei"
     nombre_display = "Papierttei"
 
